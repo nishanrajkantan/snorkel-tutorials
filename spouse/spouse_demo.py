@@ -257,6 +257,7 @@ L_train = applier.apply(df_train)
 
 # %%
 LFAnalysis(L_dev, lfs).lf_summary(Y_dev)
+x = LFAnalysis(L_dev, lfs).lf_summary(Y_dev)
 
 # %% [markdown]
 # ### Training the Label Model
