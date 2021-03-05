@@ -25,6 +25,9 @@ if os.path.basename(os.getcwd()) == "snorkel-tutorials":
 from utils import load_data
 
 ((df_dev, Y_dev), df_train, (df_test, Y_test)) = load_data()
+# df_dev = pd.read_csv('dataset/dev_data.csv')
+# df_train = pd.read_csv('dataset/train_data.csv')
+# df_test = pd.read_csv('dataset/test_data.csv')
 
 # %% [markdown]
 # **Input Data:** `df_dev`, `df_train`, and `df_test` are `Pandas DataFrame` objects, where each row represents a particular __candidate__. For our problem, a candidate consists of a sentence, and two people mentioned in the sentence. The DataFrames contain the fields `sentence`, which refers to the sentence of the candidate, `tokens`, the tokenized form of the sentence, and `person1_word_idx` and `person2_word_idx`, which represent `[start, end]` indices in the tokens at which the first and second person's name appear, respectively.
@@ -44,7 +47,7 @@ df_dev.head()
 # %%
 from preprocessors import get_person_text
 
-candidate = df_dev.loc[2]
+candidate = df_dev.loc[1]
 person_names = get_person_text(candidate).person_names
 
 print("Sentence: ", candidate["sentence"])
@@ -95,21 +98,31 @@ ABSTAIN = -1
 from snorkel.labeling import labeling_function
 
 # Check for the `spouse` words appearing between the person mentions
-spouses = {"spouse", "wife", "husband", "ex-wife", "ex-husband"}
+# spouses = {"spouse", "wife", "husband", "ex-wife", "ex-husband"}
+#
+#
+# @labeling_function(resources=dict(spouses=spouses))
+# def lf_husband_wife(x, spouses):
+#     return POSITIVE if len(spouses.intersection(set(x.between_tokens))) > 0 else ABSTAIN
 
 
-@labeling_function(resources=dict(spouses=spouses))
-def lf_husband_wife(x, spouses):
-    return POSITIVE if len(spouses.intersection(set(x.between_tokens))) > 0 else ABSTAIN
+#####################################
+employment = {"work", "working", "works", "employed", "hired"}
 
 
+@labeling_function(resources=dict(employment=employment))
+def lf_employer_employee(x, employment):
+    return POSITIVE if len(employment.intersection(set(x.between_tokens))) > 0 else ABSTAIN
+
+
+##################################################
 # %%
 # Check for the `spouse` words appearing to the left of the person mentions
-@labeling_function(resources=dict(spouses=spouses), pre=[get_left_tokens])
-def lf_husband_wife_left_window(x, spouses):
-    if len(set(spouses).intersection(set(x.person1_left_tokens))) > 0:
+@labeling_function(resources=dict(employment=employment), pre=[get_left_tokens])
+def lf_employer_employee_left_window(x, employment):
+    if len(set(employment).intersection(set(x.person1_left_tokens))) > 0:
         return POSITIVE
-    elif len(set(spouses).intersection(set(x.person2_left_tokens))) > 0:
+    elif len(set(employment).intersection(set(x.person2_left_tokens))) > 0:
         return POSITIVE
     else:
         return ABSTAIN
@@ -117,63 +130,63 @@ def lf_husband_wife_left_window(x, spouses):
 
 # %%
 # Check for the person mentions having the same last name
-@labeling_function(pre=[get_person_last_names])
-def lf_same_last_name(x):
-    p1_ln, p2_ln = x.person_lastnames
-
-    if p1_ln and p2_ln and p1_ln == p2_ln:
-        return POSITIVE
-    return ABSTAIN
-
+# @labeling_function(pre=[get_person_last_names])
+# def lf_same_last_name(x):
+#     p1_ln, p2_ln = x.person_lastnames
+#
+#     if p1_ln and p2_ln and p1_ln == p2_ln:
+#         return POSITIVE
+#     return ABSTAIN
+#
 
 # %%
 # Check for the word `married` between person mentions
 @labeling_function()
-def lf_married(x):
-    return POSITIVE if "married" in x.between_tokens else ABSTAIN
+def lf_appoint(x):
+    return POSITIVE if "appoint" in x.between_tokens else ABSTAIN
 
 
 # %%
 # Check for words that refer to `family` relationships between and to the left of the person mentions
-family = {
-    "father",
-    "mother",
-    "sister",
-    "brother",
-    "son",
-    "daughter",
-    "grandfather",
-    "grandmother",
-    "uncle",
-    "aunt",
-    "cousin",
-}
-family = family.union({f + "-in-law" for f in family})
-
-
-@labeling_function(resources=dict(family=family))
-def lf_familial_relationship(x, family):
-    return NEGATIVE if len(family.intersection(set(x.between_tokens))) > 0 else ABSTAIN
-
-
-@labeling_function(resources=dict(family=family), pre=[get_left_tokens])
-def lf_family_left_window(x, family):
-    if len(set(family).intersection(set(x.person1_left_tokens))) > 0:
-        return NEGATIVE
-    elif len(set(family).intersection(set(x.person2_left_tokens))) > 0:
-        return NEGATIVE
-    else:
-        return ABSTAIN
+# family = {
+#     "father",
+#     "mother",
+#     "sister",
+#     "brother",
+#     "son",
+#     "daughter",
+#     "grandfather",
+#     "grandmother",
+#     "uncle",
+#     "aunt",
+#     "cousin",
+# }
+# family = family.union({f + "-in-law" for f in family})
+#
+#
+# @labeling_function(resources=dict(family=family))
+# def lf_familial_relationship(x, family):
+#     return NEGATIVE if len(family.intersection(set(x.between_tokens))) > 0 else ABSTAIN
+#
+#
+# @labeling_function(resources=dict(family=family), pre=[get_left_tokens])
+# def lf_family_left_window(x, family):
+#     if len(set(family).intersection(set(x.person1_left_tokens))) > 0:
+#         return NEGATIVE
+#     elif len(set(family).intersection(set(x.person2_left_tokens))) > 0:
+#         return NEGATIVE
+#     else:
+#         return ABSTAIN
 
 
 # %%
 # Check for `other` relationship words between person mentions
-other = {"boyfriend", "girlfriend", "boss", "employee", "secretary", "co-worker"}
-
-
-@labeling_function(resources=dict(other=other))
-def lf_other_relationship(x, other):
-    return NEGATIVE if len(other.intersection(set(x.between_tokens))) > 0 else ABSTAIN
+# other = {"boyfriend", "girlfriend", "boss", "employee", "secretary", "co-worker"}
+#
+#
+# @labeling_function(resources=dict(other=other))
+# def lf_other_relationship(x, other):
+#     return NEGATIVE if len(other.intersection(set(x.between_tokens))) > 0 else ABSTAIN
 
 
 # %% [markdown]
@@ -193,6 +206,8 @@ with open("data/dbpedia.pkl", "rb") as f:
 
 list(known_spouses)[0:5]
 
+known_spouses = {('Ali', 'Tesla'), ('Patrick', 'DataMicron')}
+
 
 # %%
 @labeling_function(resources=dict(known_spouses=known_spouses), pre=[get_person_text])
@@ -205,28 +220,28 @@ def lf_distant_supervision(x, known_spouses):
 
 
 # %%
-from preprocessors import last_name
-
-# Last name pairs for known spouses
-last_names = set(
-    [
-        (last_name(x), last_name(y))
-        for x, y in known_spouses
-        if last_name(x) and last_name(y)
-    ]
-)
-
-
-@labeling_function(resources=dict(last_names=last_names), pre=[get_person_last_names])
-def lf_distant_supervision_last_names(x, last_names):
-    p1_ln, p2_ln = x.person_lastnames
-
-    return (
-        POSITIVE
-        if (p1_ln != p2_ln)
-        and ((p1_ln, p2_ln) in last_names or (p2_ln, p1_ln) in last_names)
-        else ABSTAIN
-    )
+# from preprocessors import last_name
+#
+# # Last name pairs for known spouses
+# last_names = set(
+#     [
+#         (last_name(x), last_name(y))
+#         for x, y in known_spouses
+#         if last_name(x) and last_name(y)
+#     ]
+# )
+#
+#
+# @labeling_function(resources=dict(last_names=last_names), pre=[get_person_last_names])
+# def lf_distant_supervision_last_names(x, last_names):
+#     p1_ln, p2_ln = x.person_lastnames
+#
+#     return (
+#         POSITIVE
+#         if (p1_ln != p2_ln)
+#            and ((p1_ln, p2_ln) in last_names or (p2_ln, p1_ln) in last_names)
+#         else ABSTAIN
+#     )
 
 
 # %% [markdown]
@@ -237,15 +252,18 @@ def lf_distant_supervision_last_names(x, last_names):
 from snorkel.labeling import PandasLFApplier
 
 lfs = [
-    lf_husband_wife,
-    lf_husband_wife_left_window,
-    lf_same_last_name,
-    lf_married,
-    lf_familial_relationship,
-    lf_family_left_window,
-    lf_other_relationship,
+    lf_employer_employee,
+    lf_employer_employee_left_window,
+    lf_appoint,
+    # lf_husband_wife,
+    # lf_husband_wife_left_window,
+    # lf_same_last_name,
+    # lf_married,
+    # lf_familial_relationship,
+    # lf_family_left_window,
+    # lf_other_relationship,
     lf_distant_supervision,
-    lf_distant_supervision_last_names,
+    # lf_distant_supervision_last_names,
 ]
 applier = PandasLFApplier(lfs)
 

@@ -1,0 +1,6 @@
+person1_word_idx,person2_word_idx,sentence,tokens,person1_right_tokens,person2_right_tokens,between_tokens
+"(0, 0)","(3, 3)",Johnny works for Apple.,"['Johnny', 'works', 'for', 'Apple', '.']","['works', 'for', 'Apple', '.']",['.'],['works']
+"(0, 0)","(4, 4)",Jamie enjoys working for Google.,"['Jamie', 'enjoys', 'working', 'for', 'Google', '.']","['enjoys', 'working', 'for', 'Google', '.']",['.'],"['enjoys', 'working', 'for']"
+"(0, 0)","(3, 3)",Choi has joined Google.,"['Choi', 'has', 'joined', 'Google', '.']","['has', 'joined', 'Google', '.']",['.'],"['has', 'joined']"
+"(2, 2)","(0, 0)",Lazada and Zeus has agreed on their employment contract.,"['Lazada', 'and', 'Zeus', 'has', 'agreed', 'on', 'their', 'employment', 'contract', '.']","['has', 'agreed', 'on', 'their', 'employment', 'contract', '.']","['and', 'Zeus', 'has', 'agreed', 'on', 'their', 'employment', 'contract', '.']",['and']
+"(3, 3)","(0, 0)",Palm has hired Timo to be their software engineer.,"['Palm', 'has', 'hired', 'Timo', 'to', 'be', 'their', 'software', 'engineer', '.']","['to', 'be', 'their', 'software', 'engineer', '.']","['has', 'hired', 'Timo', 'to', 'be', 'their', 'software', 'engineer', '.']","['has', 'hired']"

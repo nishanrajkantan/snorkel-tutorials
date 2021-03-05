@@ -1,0 +1,3 @@
+person1_word_idx,person2_word_idx,sentence,tokens,person1_right_tokens,person2_right_tokens,between_tokens
+"(0, 0)","(3, 3)",Choi has joined Google.,"['Choi', 'has', 'joined', 'Google', '.']","['has', 'joined', 'Google', '.']",['.'],"['has', 'joined']"
+"(3, 3)","(0, 0)",Palm has hired Timo to be their software engineer.,"['Palm', 'has', 'hired', 'Timo', 'to', 'be', 'their', 'software', 'engineer', '.']","['to', 'be', 'their', 'software', 'engineer', '.']","['has', 'hired', 'Timo', 'to', 'be', 'their', 'software', 'engineer', '.']","['has', 'hired']"
